@@ -6,3 +6,5 @@ Author-email: pranav.pani@gmail.com
 Requires-Dist: pandas
 Requires-Dist: numpy
 Requires-Dist: seaborn
+Requires-Dist: textblob
+Requires-Dist: scikit-learn
