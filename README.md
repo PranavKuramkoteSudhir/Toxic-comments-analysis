@@ -35,21 +35,6 @@ The project follows a modular architecture with the following components:
    - Model evaluation and selection
    - Hyperparameter tuning
 
-## Project Structure
-
-prod_model/
-├── artifacts/
-├── logs/
-├── src/
-│   ├── pipeline/
-│   ├── dataset/
-│   ├── exception.py
-│   ├── logger.py
-│   └── utils.py
-├── requirements.txt
-├── setup.py
-└── README.md
-
 ## Technologies Used
 - Python
 - Scikit-learn
