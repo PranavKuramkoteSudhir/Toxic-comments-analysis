@@ -3,4 +3,5 @@ numpy
 seaborn
 textblob
 scikit-learn
+dill
 -e .

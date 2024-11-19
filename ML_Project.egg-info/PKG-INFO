@@ -8,3 +8,4 @@ Requires-Dist: numpy
 Requires-Dist: seaborn
 Requires-Dist: textblob
 Requires-Dist: scikit-learn
+Requires-Dist: dill
