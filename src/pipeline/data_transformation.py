@@ -15,7 +15,7 @@ from src.utils import save_object
 @dataclass
 class DataTransformationConfig:
     preprocessor_obj_file_path = os.path.join('artifacts', "preprocessor.pkl")
-    max_features = 50000
+    max_features = 10000
     min_df = 2
     max_df = 0.95
 
@@ -64,6 +64,8 @@ class DataTransformation:
         This function creates the data transformation pipeline
         """
         try:
+            logging.info("Starting data transformer creation")
+            
             # Create the text processing pipeline
             text_pipeline = Pipeline([
                 ('preprocessor', TextPreprocessor()),
@@ -90,9 +92,11 @@ class DataTransformation:
                 sparse_threshold=0  # Force dense output
             )
             
+            logging.info("Data transformer creation completed")
             return preprocessor
             
         except Exception as e:
+            logging.error("Error in getting data transformer object")
             raise CustomException(e, sys)
     
     def initiate_data_transformation(self, train_path, test_path):
@@ -141,6 +145,7 @@ class DataTransformation:
             )
             
         except Exception as e:
+            logging.error("Error in initiating data transformation")
             raise CustomException(e, sys)
 
 def test_transformation_pipeline():
@@ -186,7 +191,6 @@ def test_transformation_pipeline():
         print(f"Test target shape: {test_target_arr.shape}")
         print(f"Preprocessor saved at: {preprocessor_path}")
         
-        # Show sample of transformed features
         print("\nSample of transformed features:")
         print(f"Number of features: {train_arr.shape[1]}")
         print("First 5 features of first sample:")

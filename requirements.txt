@@ -4,4 +4,6 @@ seaborn
 textblob
 scikit-learn
 dill
--e .
+xgboost
+lightgbm
+# -e .
