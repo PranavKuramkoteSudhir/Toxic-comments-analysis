@@ -1,0 +1,52 @@
+body { 
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.main-container {
+    max-width: 800px;
+    margin: 50px auto;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-main {
+    padding: 10px 30px;
+    font-size: 1.2em;
+}
+
+.prediction-result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.nav-link {
+    color: #0d6efd;
+    text-decoration: none;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.analysis-section {
+    margin-top: 30px;
+}
+
+.results-table {
+    margin-top: 20px;
+}
+
+.comment-form {
+    margin-bottom: 20px;
+}
+
+.badge {
+    font-size: 0.9em;
+    padding: 8px 12px;
+}
+
+.error-message {
+    margin-top: 15px;
+}

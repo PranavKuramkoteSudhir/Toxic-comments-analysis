@@ -12,8 +12,8 @@ from sklearn.multioutput import MultiOutputClassifier
 from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object
-from data_ingestion import DataIngestion
-from data_transformation import DataTransformation
+from src.components.data_ingestion import DataIngestion
+from src.components.data_transformation import DataTransformation, TextPreprocessor, FeatureExtractor
 
 @dataclass
 class ModelTrainerConfig:

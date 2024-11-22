@@ -6,4 +6,5 @@ scikit-learn
 dill
 xgboost
 lightgbm
+flask
 # -e .
