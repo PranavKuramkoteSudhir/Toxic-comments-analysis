@@ -9,7 +9,9 @@ src/__init__.py
 src/exception.py
 src/logger.py
 src/utils.py
-src/pipeline/__init__.py
-src/pipeline/data_ingestion.py
-src/pipeline/data_transformation.py
-src/pipeline/model_training.py
+src/components/__init__.py
+src/components/data_ingestion.py
+src/components/data_transformation.py
+src/components/model_training.py
+tests/__init__.py
+tests/test_app.py

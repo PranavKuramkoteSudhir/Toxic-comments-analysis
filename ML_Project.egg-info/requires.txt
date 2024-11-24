@@ -4,3 +4,7 @@ seaborn
 textblob
 scikit-learn
 dill
+xgboost
+lightgbm
+flask
+pytest

@@ -9,3 +9,7 @@ Requires-Dist: seaborn
 Requires-Dist: textblob
 Requires-Dist: scikit-learn
 Requires-Dist: dill
+Requires-Dist: xgboost
+Requires-Dist: lightgbm
+Requires-Dist: flask
+Requires-Dist: pytest
