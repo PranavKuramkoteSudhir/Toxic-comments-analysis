@@ -1,8 +1,5 @@
-# prod_model
+# Toxic Comments Analysis
 
-# Toxic Comment Classification Project
-
-## Overview
 This project implements a machine learning pipeline to detect and classify toxic comments across multiple categories. It uses the Jigsaw Toxic Comment Classification dataset to identify different types of toxicity like threats, obscenity, insults, and identity-based hate in text comments.
 
 ## Problem Statement
