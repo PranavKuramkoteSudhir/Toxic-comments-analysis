@@ -9,8 +9,5 @@ lightgbm
 flask
 pytest
 setuptools
-<<<<<<< HEAD
 #-e .
-=======
-#-e .
->>>>>>> db6dfeaf9f6ff91d0f4a9429414135c21820fb52
+
