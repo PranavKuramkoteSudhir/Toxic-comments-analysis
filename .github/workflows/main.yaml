@@ -1,0 +1,160 @@
+name: ML Model CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '*.md'
+      - 'logs/**'
+      - '.gitignore'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pylint pytest pytest-cov
+
+      - name: Lint code
+        run: |
+          pylint --disable=all --enable=E,F $(git ls-files '*.py')
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ --cov=src --cov-report=xml
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+
+  build-and-push-ecr-image:
+    name: Build and Push to ECR
+    needs: integration
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+            ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  deploy:
+    name: Continuous Deployment
+    needs: build-and-push-ecr-image
+    runs-on: self-hosted
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Clean up existing containers
+        run: |
+          if docker ps -a | grep -q mltest; then
+            docker stop mltest || true
+            docker rm mltest || true
+          fi
+        continue-on-error: true
+
+      - name: Pull latest image
+        run: |
+          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name mltest \
+            --restart unless-stopped \
+            --ipc=host \
+            -p 5000:5000 \
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e AWS_REGION=${{ secrets.AWS_REGION }} \
+            ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+
+      - name: Health check
+        run: |
+          timeout 60s bash -c '
+          until curl -f http://localhost:5000/; do
+            echo "Waiting for service to be up..."
+            sleep 5
+          done
+          '
+
+      - name: Clean up old images
+        run: |
+          docker system prune -af
+        continue-on-error: true
+
+      - name: Deployment Status
+        if: always()
+        run: |
+          if docker ps | grep -q mltest; then
+            echo "Deployment successful!"
+          else
+            echo "Deployment failed!"
+            exit 1
+          fi

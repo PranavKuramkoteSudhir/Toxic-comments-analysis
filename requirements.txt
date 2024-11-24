@@ -7,4 +7,5 @@ dill
 xgboost
 lightgbm
 flask
-# -e .
+pytest
+#-e .
