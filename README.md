@@ -14,6 +14,26 @@ Online toxicity is a significant challenge in digital communication. This projec
 ## Technical Architecture
 The project follows a modular architecture with the following components:
 
+project/
+├── src/
+│   ├── components/
+│   │   ├── data_ingestion.py
+│   │   ├── data_transformation.py
+│   │   └── model_training.py
+│   └── pipeline/
+│       └── prediction_pipeline.py
+├── artifacts/
+│   ├── model.pkl
+│   └── preprocessor.pkl
+├── templates/
+│   ├── css/
+│   │   └── style.css
+│   ├── home.html
+│   └── index.html
+└── tests/
+    ├── __init__.py
+    └── test_app.py
+
 1. **Data Ingestion (`data_ingestion.py`)**
    - Handles data loading and train-test splitting
    - Creates necessary artifacts directory
